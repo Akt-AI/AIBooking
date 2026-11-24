@@ -1,6 +1,6 @@
 # GitHub Actions deployment
 
-Target repository: Akt-AI/AIBooking (private by default).
+Target repository: [Akt-AI/AIBooking](https://github.com/Akt-AI/AIBooking). The publishing script creates a new repository as private and preserves the visibility of an existing repository.
 
 Pull requests run Node 24 tests and a production Docker build on GitHub-hosted runners. Main-branch pushes deploy only after both pass. Deployment jobs serialize; pull requests never receive deployment credentials.
 
@@ -19,6 +19,6 @@ After authenticating GitHub CLI with access to Akt-AI, run `./deploy/publish-git
 
 ## Current activation status
 
-The local repository, workflow, restricted SSH key and server deployment script are prepared. Direct SSH deployment has passed container health and API checks. GitHub creation, push, installation of GitHub secrets and the first Actions execution have not yet been verified because the saved GitHub login was expired. Authenticate with `gh auth login --hostname github.com --web` using an account with access to Akt-AI, then run the publishing script. Inspect the resulting Actions run before treating automatic deployment as active.
+GitHub authentication as Akt-AI is working, source and documentation are pushed, and repository deployment secrets and the server variable are installed. Review the [Actions history](https://github.com/Akt-AI/AIBooking/actions) for the outcome of each deployment. The deployment script has also been tested directly against pi. A successful push alone does not establish that its deployment passed.
 
 The Docker build in CI checks that the source builds; pi builds it again for deployment. No container registry, immutable image promotion or branch-protection rule is configured by these files. Automatic rollback covers startup/local-health failures; the later public HTTPS check reports failures without invoking rollback. See the [operations guide](../docs/OPERATIONS.md) for backup and recovery limits.

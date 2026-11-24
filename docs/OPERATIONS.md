@@ -19,7 +19,7 @@
 | Shared certificate volume | `infra_certbot_data` |
 | Renewal timer | User unit `aibooking-renew.timer` |
 
-The active-release layout was exercised directly over SSH. GitHub publishing and the first Actions run still require working authentication; see [CI/CD](../deploy/GITHUB-ACTIONS.md). Do not assume the repository exists merely because a local `origin` is configured.
+Source is published to [Akt-AI/AIBooking](https://github.com/Akt-AI/AIBooking), with GitHub deployment secrets configured. Check the [Actions history](https://github.com/Akt-AI/AIBooking/actions) and recorded server revision to establish which run successfully deployed; see [CI/CD](../deploy/GITHUB-ACTIONS.md).
 
 The original source directory remains necessary for `.env` and certificate-renewal scripts. After release-based deployment, rebuilding from that directory can deploy older source. Inspect the recorded revision and active symlink first. Do not start the standalone `compose.yaml` on pi: its proxy ports conflict with the shared proxy.
 

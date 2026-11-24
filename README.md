@@ -6,7 +6,7 @@ Compact AI-assisted rail, travel and daily-services PWA at https://aibooking.sto
 
 Start with the [documentation index](docs/README.md), [local setup](docs/DEVELOPMENT.md), [architecture](docs/ARCHITECTURE.md), [API reference](docs/API.md), [operations and troubleshooting](docs/OPERATIONS.md), or [GitHub CI/CD](deploy/GITHUB-ACTIONS.md). A credential-free configuration template is provided in [.env.example](.env.example).
 
-GitHub publishing is prepared for a private `Akt-AI/AIBooking` repository. Creation, push and the first Actions run remain pending working GitHub authentication. The deployment script has been tested directly on pi.
+Source and documentation are published to [Akt-AI/AIBooking](https://github.com/Akt-AI/AIBooking). GitHub Actions tests main-branch pushes and deploys passing revisions to pi. Check the [Actions history](https://github.com/Akt-AI/AIBooking/actions) for each deployment outcome.
 
 ## AI and a compact dashboard
 

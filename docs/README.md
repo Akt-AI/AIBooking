@@ -15,4 +15,4 @@
 
 These guides describe the implemented application. Ticket issuance, payments, AP2 transactions and independent rail-provider failover are not implemented. Booking-directory entries hand off to external providers.
 
-As of 2026-11-24, the Git repository and Actions workflow are prepared locally, and the deployment script has been exercised on pi. GitHub repository creation, remote push and the first Actions run remain unverified pending working GitHub authentication with access to Akt-AI. A server deployment test does not establish that GitHub Actions is active.
+As of 2026-11-24, source and documentation are pushed to [Akt-AI/AIBooking](https://github.com/Akt-AI/AIBooking), and GitHub deployment secrets are configured. Each run reports its test, build and deployment outcome in [GitHub Actions](https://github.com/Akt-AI/AIBooking/actions).
