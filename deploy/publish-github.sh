@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 repo=Akt-AI/AIBooking
-gh auth status --hostname github.com
+gh api user --jq .login
 test -f "$HOME/.ssh/aibooking_actions"
 test -f "$HOME/.ssh/aibooking_actions_known_hosts"
 if ! gh repo view "$repo" --json name >/dev/null 2>&1; then
