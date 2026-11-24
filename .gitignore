@@ -1,0 +1,15 @@
+node_modules/
+.env*
+*.log
+.DS_Store
+
+__pycache__/
+.tls-loaded.sha256
+
+data/
+*.sqlite*
+*.pem
+*.key
+*.tgz
+*.tar
+!\.env.example

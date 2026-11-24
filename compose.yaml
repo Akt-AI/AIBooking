@@ -1,0 +1,49 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      RAILKIT_API_KEY: ${RAILKIT_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.5-flash-lite}
+      GEMINI_FALLBACK_MODEL: ${GEMINI_FALLBACK_MODEL:-gemini-3.5-flash}
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-}
+      DATA_DIR: /app/data
+      AI_DAILY_LIMIT: ${AI_DAILY_LIMIT:-200}
+      AFFILIATE_ALLOWED_HOSTS: ${AFFILIATE_ALLOWED_HOSTS:-}
+      TRUST_PROXY: "true"
+    volumes:
+      - app_data:/app/data
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks: [internal]
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - tls_certificates:/certs:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [internal]
+  acme:
+    image: ghcr.io/acmesh-official/acme.sh:latest
+    profiles: [certificate-tools]
+    environment:
+      HOSTINGER_Token: ${HOSTINGER_Token:-}
+    volumes:
+      - acme_state:/acme.sh
+      - tls_certificates:/certs
+volumes:
+  app_data:
+  caddy_data:
+  caddy_config:
+  acme_state:
+  tls_certificates:
+networks:
+  internal:

@@ -1,0 +1,36 @@
+# Pi uses its existing caddy-mail reverse proxy and certificate volume.
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3090:3000"
+    environment:
+      RAILKIT_API_KEY: ${RAILKIT_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.5-flash-lite}
+      GEMINI_FALLBACK_MODEL: ${GEMINI_FALLBACK_MODEL:-gemini-3.5-flash}
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-}
+      DATA_DIR: /app/data
+      AI_DAILY_LIMIT: ${AI_DAILY_LIMIT:-200}
+      AFFILIATE_ALLOWED_HOSTS: ${AFFILIATE_ALLOWED_HOSTS:-}
+      TRUST_PROXY: "true"
+    volumes:
+      - app_data:/app/data
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+  acme:
+    image: ghcr.io/acmesh-official/acme.sh@sha256:78d9f4ec812fd1ca48d565fac9fee78ca67f607175afc3c58f62784b4100a369
+    profiles: [certificate-tools]
+    environment:
+      HOSTINGER_Token: ${HOSTINGER_API_KEY:?Set HOSTINGER_API_KEY in the server .env}
+    volumes:
+      - acme_state:/acme.sh
+      - wildcard_certs:/certs
+volumes:
+  app_data:
+  acme_state:
+  wildcard_certs:
+    external: true
+    name: infra_certbot_data

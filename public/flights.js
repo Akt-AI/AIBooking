@@ -1,0 +1,10 @@
+const status=document.getElementById('flight-status');
+const script=document.createElement('script');
+script.src='https://widgets.skyscanner.net/widget-server/js/loader.js';
+script.async=true;
+script.onerror=()=>{status.textContent='Flight search could not load. Use the direct Skyscanner link below.';};
+document.body.append(script);
+const slow=setTimeout(()=>{status.textContent='If the search does not appear, open Skyscanner directly below.';},12000);
+window.addEventListener('message',event=>{if(event.origin==='https://widgets.skyscanner.net'&&event.source===document.querySelector('iframe')?.contentWindow){clearTimeout(slow);status.textContent='Flight search provided by Skyscanner';}});
+const resize=new ResizeObserver(()=>{parent.postMessage({type:'aibooking-flight-height',height:Math.min(1600,Math.max(450,document.documentElement.scrollHeight))},location.origin);});
+resize.observe(document.body);

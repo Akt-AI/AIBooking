@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "aibooking-railkit": {
+      "command": "ssh",
+      "args": [
+        "pi",
+        "cd /home/pi/aibooking && docker compose -p aibooking -f compose.pi.yaml run --rm -T --no-deps -e GEMINI_API_KEY= -e ADMIN_TOKEN= app node mcp-stdio.mjs"
+      ]
+    }
+  }
+}

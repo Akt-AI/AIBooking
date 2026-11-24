@@ -1,0 +1,6 @@
+[Unit]
+Description=Renew AIBooking wildcard certificate and reload shared Caddy
+[Service]
+Type=oneshot
+WorkingDirectory=/home/pi/aibooking
+ExecStart=/bin/sh /home/pi/aibooking/deploy/renew-pi.sh
