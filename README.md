@@ -2,6 +2,12 @@
 
 Compact AI-assisted rail, travel and daily-services PWA at https://aibooking.store/, deployed through Docker Compose on SSH host `pi`. Powered by server-side `railkit@6.0.0`.
 
+## Documentation
+
+Start with the [documentation index](docs/README.md), [local setup](docs/DEVELOPMENT.md), [architecture](docs/ARCHITECTURE.md), [API reference](docs/API.md), [operations and troubleshooting](docs/OPERATIONS.md), or [GitHub CI/CD](deploy/GITHUB-ACTIONS.md). A credential-free configuration template is provided in [.env.example](.env.example).
+
+GitHub publishing is prepared for a private `Akt-AI/AIBooking` repository. Creation, push and the first Actions run remain pending working GitHub authentication. The deployment script has been tested directly on pi.
+
 ## AI and a compact dashboard
 
 The Gemini assistant helps users discover services, prefill read-only forms, retrieve and explain live rail information, and prepare a travel/shipping checklist. The dashboard shows six contextual actions at a time with desktop/sidebar and mobile/bottom navigation. Saved service shortcuts open in a drawer; long details expand on request. All fifteen rail services remain available via pagination.
@@ -70,12 +76,15 @@ Primary references checked 2026-11-24:
 
 ## Run
 
-Node.js 22+ is required.
+Use Node.js 24, matching the Docker image and CI workflow.
 
 ```sh
 npm ci --ignore-scripts
+cp .env.example .env
+chmod 600 .env
+# Edit .env with your credentials.
 npm test
-npm start
+node --env-file=.env server.mjs
 ```
 
 Open http://localhost:3000. For live queries, provide `RAILKIT_API_KEY` as a server environment variable; Compose reads it from protected server `.env`. Running Node directly requires exporting it explicitly. Never put the key in browser code.
@@ -100,14 +109,16 @@ RailKit requests have a 20-second app deadline. Missing keys, unavailable servic
 
 ## Deployment
 
-Current deployment: `/home/pi/aibooking`, project `aibooking`, file `compose.pi.yaml`. The existing Caddy proxy serves loopback port 3090, with Hostinger DNS and a Let's Encrypt apex/wildcard certificate. Daily renewal is enabled. See [the deployment record](deploy/PI-DEPLOYMENT.md).
+Pi uses Compose project `aibooking` and `compose.pi.yaml`, with the existing Caddy proxy serving loopback port 3090. Hostinger DNS and a Let's Encrypt apex/wildcard certificate are maintained separately; daily renewal is enabled.
+
+The protected environment and certificate-maintenance source remain at `/home/pi/aibooking`. Successful release source is selected by `/home/pi/aibooking-current`; its commit is recorded in `/home/pi/aibooking-current-revision`. The tested deployment script builds an extracted committed release, preserves the application volume and attempts image rollback on startup failure. See [operations](docs/OPERATIONS.md), [CI/CD setup](deploy/GITHUB-ACTIONS.md), and [the deployment record](deploy/PI-DEPLOYMENT.md).
 
 ```sh
-ssh pi 'cd /home/pi/aibooking && docker compose -p aibooking -f compose.pi.yaml up -d --build app'
+ssh pi 'cat /home/pi/aibooking-current-revision'
 curl --fail https://aibooking.store/api/status
 ```
 
-Copy reviewed source before rebuilding; exclude `.env`, `.git`, `node_modules` and `.tls-loaded.sha256`. Preserve certificate volumes and the server's `.env`. Do not run the default standalone Compose configuration on the existing Pi because its proxy already owns ports 80/443.
+Do not run the default standalone Compose configuration on the existing Pi because its proxy already owns ports 80/443. Preserve the server `.env`, data and certificate volumes. Configuration flags in `/api/status` do not verify upstream credentials or service availability.
 
 ## Validation
 
