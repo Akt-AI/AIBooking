@@ -31,7 +31,7 @@ The bot uses a private [RailKit MCP adapter](deploy/MCP.md) with fourteen read-o
 
 These are 15 service operations exposed by the installed SDK. All result data comes from RailKit; provider coverage, data freshness, account entitlement and service availability can vary. Errors are displayed without fabricated results. The SDK does not expose the newer map/delay/amenities functions mentioned in some current upstream documentation, so those are not presented.
 
-There is no simulation mode, fictional inventory, local demo ticket flow or payment form. The AI guide provides information and navigation; it cannot transact. AIBooking does not issue or cancel tickets; users can open the official IRCTC portal for booking. Existing browser-stored demo records are no longer accessed and remain untouched.
+There is no simulation mode, fictional inventory, local demo ticket flow or card/UPI credential form. The AI guide provides information and navigation; it cannot transact. AIBooking does not issue or cancel tickets; users can open the official IRCTC portal for booking. Existing browser-stored demo records are no longer accessed and remain untouched.
 
 ## Wallet & payments
 

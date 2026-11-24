@@ -26,7 +26,7 @@ The desktop layout has a persistent grouped menu; mobile uses a compact menu and
 - Approved affiliate URLs and paid placements can be configured for known providers. Destination URLs must use the provider's exact HTTPS host or an additional host explicitly configured in `AFFILIATE_ALLOWED_HOSTS`.
 - Affiliate and Sponsored labels appear on provider cards, shortcuts and relevant AI actions. A disclosure handoff page covers commercial links reached without the UI disclosure flag. Paid placements are separate from AI advice; paid status is not sent to the recommendation model.
 - A partner/business enquiry form stores consented business contact leads for operator review. It does not email third parties or create a paid agreement.
-- No affiliate ID, sponsor or paid subscription is invented. Commercial placements begin disabled. Revenue requires real affiliate/advertiser agreements and properly configured links. There is no subscription billing or payment gateway in this release.
+- No affiliate ID, sponsor or paid subscription is invented. Commercial placements begin disabled. Revenue requires real affiliate/advertiser agreements and properly configured links. There is no subscription billing. Optional [Razorpay-hosted wallet/payment requests](../docs/PAYMENTS.md) support separately agreed AIBooking services and remain disabled until merchant setup is complete.
 
 ## Operations dashboard
 

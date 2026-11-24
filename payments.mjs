@@ -19,8 +19,8 @@ export function validatePayment(input){
  return {amount,description,requestKey};
 }
 export function createPayments({store,keyId=process.env.RAZORPAY_KEY_ID,keySecret=process.env.RAZORPAY_KEY_SECRET,webhookSecret=process.env.RAZORPAY_WEBHOOK_SECRET,enabled=process.env.PAYMENTS_ENABLED==='true',adminToken=process.env.ADMIN_TOKEN,fetchFn=fetch}={}){
- const ready=Boolean(enabled&&keyId&&keySecret&&webhookSecret),mode=keyId?.startsWith('rzp_live_')?'live':'test',limit=createLimiter(),inflight=new Set();
- const safe=row=>({id:row.id,amount:row.amount,currency:'INR',description:row.description,status:row.status,mode:row.mode,checkoutUrl:row.status==='created'?row.checkout_url:null,updatedAt:row.updated,expiresAt:row.expires});
+ const connected=Boolean(keyId&&keySecret&&webhookSecret),ready=Boolean(enabled&&connected),mode=keyId?.startsWith('rzp_live_')?'live':'test',limit=createLimiter(),inflight=new Set();
+ const safe=row=>({id:row.id,amount:row.amount,currency:'INR',description:row.description,status:row.status,mode:row.mode,checkoutUrl:ready&&row.mode===mode&&row.status==='created'&&row.expires*1000>Date.now()?row.checkout_url:null,updatedAt:row.updated,expiresAt:row.expires});
  async function provider(path,body){
   const response=await fetchFn('https://api.razorpay.com/v1/payment_links'+path,{method:body?'POST':'GET',headers:{Authorization:'Basic '+Buffer.from(keyId+':'+keySecret).toString('base64'),'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(12000)});
   if(!response.ok)throw Error('Payment provider unavailable.');
@@ -36,7 +36,7 @@ export function createPayments({store,keyId=process.env.RAZORPAY_KEY_ID,keySecre
   if(url.pathname==='/api/payments/config'&&req.method==='GET')return json(res,200,{configured:ready,provider:'Razorpay',mode:ready?mode:null,storedBalance:false});
   if(url.pathname==='/api/payments/webhook'){
    if(req.method!=='POST')return json(res,405,{error:'Use POST.'});
-   if(!ready)return json(res,503,{error:'Payments are not enabled.'});
+   if(!connected)return json(res,503,{error:'Payment verification is not configured.'});
    const chunks=[];let size=0;
    for await(const chunk of req){const b=Buffer.from(chunk);size+=b.length;if(size>65536)return json(res,413,{error:'Request too large.'});chunks.push(b);}
    const raw=Buffer.concat(chunks);
@@ -79,7 +79,7 @@ export function createPayments({store,keyId=process.env.RAZORPAY_KEY_ID,keySecre
   if(!limit('read:'+clientIP(req),30,60000))return json(res,429,{error:'Please wait before checking again.'});
   const row=store.payment(match[1]);if(!row)return json(res,404,{error:'Request not found.'});
   if(!match[2])return json(res,200,safe(row));
-  if(!ready||row.mode!==mode||!row.provider_id)return json(res,503,{error:'Payment verification is unavailable. Contact AIBooking support.'});
+  if(!connected||row.mode!==mode||!row.provider_id)return json(res,503,{error:'Payment verification is unavailable. Contact AIBooking support.'});
   if(inflight.has(row.id)||!limit('refresh:'+row.id,4,60000))return json(res,429,{error:'Please wait before refreshing this payment.'});
   inflight.add(row.id);
   try{const entity=await provider('/'+encodeURIComponent(row.provider_id));store.paymentStatus(row.id,checkEntity(row,entity));return json(res,200,safe(store.payment(row.id)));}

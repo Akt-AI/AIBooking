@@ -54,6 +54,10 @@ test('webhooks validate exact raw signatures, amount, reference and mode; duplic
  const liveHandler=createPayments({store:f.store,enabled:true,keyId:'rzp_live_example',keySecret:'test-secret-key',webhookSecret:secret,adminToken});
  const crossMode=JSON.stringify({event:'payment_link.paid',payload:{payment_link:{entity:paid}}});
  assert.equal((await request(liveHandler,'/api/payments/webhook',{method:'POST',raw:crossMode,headers:{'x-razorpay-signature':createHmac('sha256',secret).update(crossMode).digest('hex')}})).body.ignored,true);assert.equal(f.store.payment(id).status,'created');
+ const disabledHandler=createPayments({store:f.store,enabled:false,keyId:'rzp_test_example',keySecret:'test-secret-key',webhookSecret:secret,adminToken});
+ assert.equal((await request(disabledHandler,'/api/payments/requests/'+id)).body.checkoutUrl,null);
+ assert.equal((await request(disabledHandler,'/api/payments/webhook',{method:'POST',raw:crossMode,headers:{'x-razorpay-signature':createHmac('sha256',secret).update(crossMode).digest('hex')}})).status,200);
+ assert.equal(f.store.payment(id).status,'paid');
  assert.equal((await webhook(paid)).status,200);const updated=f.store.payment(id).updated;
  assert.equal((await webhook(paid)).status,200);assert.equal(f.store.payment(id).updated,updated);
  f.store.paymentStatus(id,'expired');assert.equal(f.store.payment(id).status,'paid');
