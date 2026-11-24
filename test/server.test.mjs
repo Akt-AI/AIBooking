@@ -12,7 +12,7 @@ test('serves app and security policy',async()=>{const r=await fetch(base);assert
 test('reports disconnected integrations honestly',async()=>{const r=await fetch(base+'/api/status');assert.deepEqual(await r.json(),{status:'ok',mode:'rail-information',railBooking:false,ap2Payments:false,railkitConfigured:Boolean(process.env.RAILKIT_API_KEY),aiConfigured:Boolean(process.env.GEMINI_API_KEY||process.env['GEMINI-API-KEY']),railMcpEnabled:true});});
 test('never pretends to book or pay',async()=>{for(const route of ['book','pay','mandates']){const r=await fetch(base+'/api/'+route,{method:'POST',body:'{}'});assert.equal(r.status,503);assert.match((await r.json()).error,/No transaction/);}});
 test('missing files and disallowed writes fail',async()=>{assert.equal((await fetch(base+'/missing')).status,404);assert.equal((await fetch(base+'/',{method:'POST'})).status,405);});
-test('PWA assets are available',async()=>{for(const asset of ['/sw.js','/manifest.webmanifest','/icon.svg','/app.js','/style.css','/services.js','/bookings.js','/flights.html','/flights.js','/flights.css','/assistant-ui.js','/growth-ui.js','/admin.html','/admin.js'])assert.equal((await fetch(base+asset)).status,200);});
+test('PWA assets are available',async()=>{for(const asset of ['/sw.js','/manifest.webmanifest','/icon.svg','/app.js','/style.css','/services.js','/bookings.js','/flights.html','/flights.js','/flights.css','/assistant-ui.js','/growth-ui.js','/admin.html','/admin.js','/wallet.html','/wallet.js'])assert.equal((await fetch(base+asset)).status,200);});
 
 test('removed simulation assets cannot be served',async()=>{assert.equal((await fetch(base+'/simulation.js')).status,404);const html=await(await fetch(base)).text();assert.doesNotMatch(html,/Simulation mode|Simulate payment|demo booking|Booking assistant/);});
 
@@ -23,4 +23,10 @@ test('external scripts are restricted to the flight embed page',async()=>{
  assert.match(widget.headers.get('content-security-policy'),/script-src 'self' https:\/\/widgets.skyscanner.net https:\/\/js.skyscnr.com;/);
  assert.match(widget.headers.get('content-security-policy'),/frame-ancestors 'self'/);
  const html=await main.text();assert.match(html,/id="flight-frame"/);assert.doesNotMatch(html,/<iframe[^>]+src=/);assert.match(html,/AIBooking does not receive your payment/);
+});
+
+test('wallet integration is discoverable and checkout configuration is separate from process health',async()=>{
+ const html=await(await fetch(base)).text();assert.match(html,/href="\/wallet.html"/);
+ const config=await(await fetch(base+'/api/payments/config')).json();assert.equal(config.provider,'Razorpay');assert.equal(config.storedBalance,false);
+ const wallet=await fetch(base+'/wallet.html');assert.equal(wallet.headers.get('referrer-policy'),'no-referrer');assert.match(await wallet.text(),/name="referrer" content="no-referrer"/);
 });

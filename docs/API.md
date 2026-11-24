@@ -98,6 +98,10 @@ Enquiry request:
 
 `interest` is `sponsorship`, `affiliate` or `business-concierge`. Company is 2–100 characters; message is 10–2,000 characters; a valid email and literal consent `true` are required. Leave the honeypot `website` empty. Limits: 5,000-byte body, three submissions/hour/address, maximum 5,000 stored enquiries. Success is `201` with an ID and message. Use a development database for test submissions.
 
+## Wallet and payment checkout
+
+Optional Razorpay payment requests, customer status lookups and the signed webhook endpoint are described in the [payment API and activation guide](PAYMENTS.md). They process agreed AIBooking service requests; external provider bookings still use provider checkout. The original `/api/pay` route remains unavailable and is not a wallet API.
+
 ## Admin APIs
 
 Send `Authorization: Bearer <ADMIN_TOKEN>` in a header. Never put the token in a URL. Missing, incorrect or shorter-than-24-character configured credentials return `401`. These routes also enforce the allowed Origin list when an Origin header is supplied; requests without Origin still require authentication.

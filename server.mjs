@@ -1,4 +1,5 @@
 import http from 'node:http';
+import {createPayments} from './payments.mjs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -11,6 +12,7 @@ import { createRailkitHandler } from './railkit.mjs';
 const railkit = createRailkitHandler();
 const store = createStore(process.env.DATA_DIR ? path.join(process.env.DATA_DIR,'aibooking.sqlite') : ':memory:');
 const commerce = createCommerce({store});
+const payments = createPayments({store});
 const railMCP = createRailMCPBridge({railkit});
 const assistant = createAssistant({store,railkit,railQuery:railMCP.query});
 const rateLimits = new Map();
@@ -21,9 +23,11 @@ export async function handler(req,res) {
   res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');
   res.setHeader('Content-Security-Policy',"default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self'; connect-src 'self'; frame-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
   const url = new URL(req.url,'http://localhost');
+  if (url.pathname === '/wallet.html') res.setHeader('Referrer-Policy','no-referrer');
   if (url.pathname === '/flights.html') {
     res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' https://widgets.skyscanner.net https://js.skyscnr.com; style-src 'self' 'unsafe-inline' https://css.skyscnr.com; img-src 'self' data: https://*.skyscanner.net https://*.skyscnr.com; connect-src https://widgets.skyscanner.net https://www.skyscanner.net https://www.skyscanner.com; frame-src https://widgets.skyscanner.net; object-src 'none'; base-uri 'none'; frame-ancestors 'self'; form-action https://www.skyscanner.net https://www.skyscanner.co.in https://www.skyscanner.com");
   }
+  if (url.pathname.startsWith('/api/payments/') || url.pathname === '/api/admin/payment-requests') return payments(req,res,url);
   if (url.pathname === '/api/assistant') return assistant(req,res);
   if (url.pathname === '/api/commerce' || url.pathname === '/api/partner-enquiries' || url.pathname.startsWith('/api/admin/') || url.pathname.startsWith('/go/')) return commerce(req,res,url);
   if (url.pathname === '/api/status') {

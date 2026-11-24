@@ -12,7 +12,7 @@ Source and documentation are published to [Akt-AI/AIBooking](https://github.com/
 
 The Gemini assistant helps users discover services, prefill read-only forms, retrieve and explain live rail information, and prepare a travel/shipping checklist. The dashboard shows six contextual actions at a time with desktop/sidebar and mobile/bottom navigation. Saved service shortcuts open in a drawer; long details expand on request. All fifteen rail services remain available via pagination.
 
-Commercial features include tracked provider referrals, configurable and disclosed affiliate/sponsored links, business enquiry capture and an authenticated operations dashboard. Paid placements are disabled until real agreements and links are configured. There is no subscription/payment processing. See [AI and monetization operations](deploy/AI-MONETIZATION.md).
+Commercial features include tracked provider referrals, configurable and disclosed affiliate/sponsored links, business enquiry capture and an authenticated operations dashboard. Paid placements are disabled until real agreements and links are configured. There is no subscription billing. An optional [hosted wallet/payment checkout](docs/PAYMENTS.md) supports agreed AIBooking service requests; it is disabled until merchant credentials and webhooks are configured. See [AI and monetization operations](deploy/AI-MONETIZATION.md).
 
 The bot uses a private [RailKit MCP adapter](deploy/MCP.md) with fourteen read-only tools and an optional SSH/stdio connection for external MCP clients. This is our adapter, not an upstream RailKit MCP service or an additional rail-data provider.
 
@@ -32,6 +32,10 @@ The bot uses a private [RailKit MCP adapter](deploy/MCP.md) with fourteen read-o
 These are 15 service operations exposed by the installed SDK. All result data comes from RailKit; provider coverage, data freshness, account entitlement and service availability can vary. Errors are displayed without fabricated results. The SDK does not expose the newer map/delay/amenities functions mentioned in some current upstream documentation, so those are not presented.
 
 There is no simulation mode, fictional inventory, local demo ticket flow or payment form. The AI guide provides information and navigation; it cannot transact. AIBooking does not issue or cancel tickets; users can open the official IRCTC portal for booking. Existing browser-stored demo records are no longer accessed and remain untouched.
+
+## Wallet & payments
+
+The menu links to a compact [payment page](https://aibooking.store/wallet.html). Administrators can issue fixed-amount INR service requests through Razorpay; payment status is verified on the server. Existing wallets and other payment methods are presented by provider checkout when eligible. This does not hold user funds, top up an AIBooking balance or pay for external provider bookings. See [activation, API and operational limits](docs/PAYMENTS.md).
 
 ## Booking options
 

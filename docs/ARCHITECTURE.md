@@ -8,6 +8,7 @@ flowchart LR
   Caddy --> App[Node HTTP app on pi]
   App --> Rail[RailKit server SDK]
   App --> AI[Gemini API]
+  App --> Payments[Razorpay hosted payment links]
   App --> SQLite[(Persistent SQLite)]
   App --> MCP[Private in-process MCP bridge]
   MCP --> Rail
@@ -38,6 +39,7 @@ Gemini can have one bounded fallback model attempt on transient failures. Each m
 | Referral counts | SQLite `clicks`: day, provider, source and count; no stored visitor identity |
 | Commercial placements | SQLite `placements`: provider, approved destination URL and disclosure flags |
 | Business enquiries | SQLite `leads`: company, email, message, consent, status and timestamps |
+| Payment requests | SQLite `payment_requests`: agreed amount/description, mode, capability reference, provider link ID, state and timestamps; no wallet balance |
 | PNR query/results | Sent to RailKit for the dedicated lookup; not saved in app SQLite or the service worker |
 | API keys and admin token | Protected server environment; excluded from Git and browser bundles |
 
@@ -52,6 +54,8 @@ Enquiry retention has no automatic deletion job. Operators must define retention
 - Commercial redirects resolve known provider IDs and validated hosts. Affiliate/sponsored placements require disclosure; click counts are not sales or revenue.
 - AI and commerce use in-memory per-address limits; AI additionally has a persistent daily allowance. Public rail limiting uses the direct socket address, so the shared proxy currently creates a shared 20-request/minute bucket.
 - In-memory limits reset on restart and do not coordinate across replicas. The design currently assumes one app instance.
-- There are no ticket/payment APIs, AP2 financial mandates, refunds, user ticket history, seat holds or guaranteed booking actions.
+- There are no ticket issuance APIs, stored-value balances, AP2 financial mandates, refunds, user ticket history, seat holds or guaranteed booking actions.
 
 See [operations](OPERATIONS.md) for troubleshooting and [development](DEVELOPMENT.md) for configuration.
+
+Optional hosted checkout for agreed AIBooking service requests is documented in [Wallet & payments](PAYMENTS.md). It does not fund third-party booking handoffs.
